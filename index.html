@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portfólio Matemática Divertida</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background-color: #00695c;
+      color: white;
+      padding: 20px;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: scale(1.05);
+    }
+    .card img {
+      width: 100px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+    button {
+      background-color: #2e8b57;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 16px;
+      margin: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #3cb371;
+    }
+    #mensagem {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    #btnVoltar {
+      background-color: #ff6347;
+      margin-top: 15px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    #btnVoltar:hover {
+      background-color: #ff4500;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Portfólio Visual - Matemática Divertida</h1>
+    <p>Escolha um nível e comece a brincar com a matemática!</p>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/201/201818.png" alt="Fácil" />
+      <h2>Fácil</h2>
+      <p>Adição e subtração simples</p>
+      <button onclick="iniciar('facil')">Começar</button>
+    </div>
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/201/201614.png" alt="Médio" />
+      <h2>Médio</h2>
+      <p>Multiplicação e divisão</p>
+      <button onclick="iniciar('medio')">Começar</button>
+    </div>
+    <div class="card">
+      <img src="https://cdn-icons-png.flaticon.com/512/201/201623.png" alt="Difícil" />
+      <h2>Difícil</h2>
+      <p>Desafios mistos</p>
+      <button onclick="iniciar('dificil')">Começar</button>
+    </div>
+  </div>
+
+  <div class="atividade" style="display:none;">
+    <h2 id="pergunta"></h2>
+    <div id="opcoes"></div>
+    <p id="mensagem"></p>
+    <button id="btnVoltar">Voltar ao menu</button>
+  </div>
+
+  <audio id="acerto" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
+  <audio id="erro" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+
+  <script>
+    const exercicios = {
+      facil: [
+        { pergunta: '2 + 3 = ?', opcoes: [5, 4, 6], correta: 5 },
+        { pergunta: '5 - 1 = ?', opcoes: [4, 5, 3], correta: 4 },
+        { pergunta: '7 + 2 = ?', opcoes: [8, 9, 10], correta: 9 },
+        { pergunta: '10 - 4 = ?', opcoes: [7, 6, 5], correta: 6 },
+        { pergunta: '1 + 8 = ?', opcoes: [9, 8, 7], correta: 9 },
+        { pergunta: '6 - 3 = ?', opcoes: [4, 3, 2], correta: 3 }
+      ],
+      medio: [
+        { pergunta: '3 x 2 = ?', opcoes: [6, 5, 4], correta: 6 },
+        { pergunta: '8 ÷ 2 = ?', opcoes: [4, 3, 5], correta: 4 },
+        { pergunta: '5 x 3 = ?', opcoes: [15, 10, 20], correta: 15 },
+        { pergunta: '12 ÷ 4 = ?', opcoes: [2, 3, 4], correta: 3 },
+        { pergunta: '7 x 2 = ?', opcoes: [14, 12, 13], correta: 14 },
+        { pergunta: '18 ÷ 3 = ?', opcoes: [6, 5, 7], correta: 6 }
+      ],
+      dificil: [
+        { pergunta: '7 + 5 = ?', opcoes: [12, 11, 13], correta: 12 },
+        { pergunta: '9 - 4 = ?', opcoes: [5, 6, 7], correta: 5 },
+        { pergunta: '4 x 6 = ?', opcoes: [24, 20, 26], correta: 24 },
+        { pergunta: '15 ÷ 3 = ?', opcoes: [5, 4, 6], correta: 5 },
+        { pergunta: '8 + 7 - 3 = ?', opcoes: [12, 13, 14], correta: 12 },
+        { pergunta: '20 - 9 + 2 = ?', opcoes: [13, 12, 11], correta: 13 }
+      ]
+    };
+
+    let nivel = '';
+    let indice = 0;
+
+    function iniciar(n) {
+      nivel = n;
+      indice = 0;
+      document.querySelector('.container').style.display = 'none';
+      document.querySelector('.atividade').style.display = 'block';
+      mostrar();
+    }
+
+    function mostrar() {
+      const ex = exercicios[nivel][indice];
+      document.getElementById('pergunta').textContent = `${ex.pergunta} (${indice + 1} de ${exercicios[nivel].length})`;
+      const opDiv = document.getElementById('opcoes');
+      opDiv.innerHTML = '';
+
+      // Embaralha opções
+      const opcoesEmbaralhadas = ex.opcoes.slice().sort(() => Math.random() - 0.5);
+
+      opcoesEmbaralhadas.forEach(o => {
+        const btn = document.createElement('button');
+        btn.textContent = o;
+        btn.onclick = () => verificar(o, btn);
+        opDiv.appendChild(btn);
+      });
+
+      document.getElementById('mensagem').textContent = '';
+    }
+
+    function verificar(resposta, botaoClicado) {
+      const ex = exercicios[nivel][indice];
+      const mensagem = document.getElementById('mensagem');
+      if (resposta === ex.correta) {
+        mensagem.textContent = 'Muito bem! 😊';
+        mensagem.style.color = 'green';
+        document.getElementById('acerto').play();
+        botaoClicado.style.backgroundColor = '#4CAF50'; // verde
+
+        // Desabilita botões para evitar múltiplos cliques
+        desabilitarBotoes(true);
+
+        setTimeout(() => {
+          indice++;
+          if (indice < exercicios[nivel].length) {
+            desabilitarBotoes(false);
+            mostrar();
+          } else {
+            mensagem.textContent = 'Parabéns! Você concluiu o nível!';
+            document.querySelector('.atividade').style.display = 'none';
+            document.querySelector('.container').style.display = 'grid';
+          }
+        }, 1000);
+      } else {
+        mensagem.textContent = 'Tente novamente! 😅';
+        mensagem.style.color = 'red';
+        document.getElementById('erro').play();
+        botaoClicado.style.backgroundColor = '#f44336'; // vermelho
+        setTimeout(() => {
+          botaoClicado.style.backgroundColor = '';
+        }, 500);
+      }
+    }
+
+    function desabilitarBotoes(disabled) {
+      const botoes = document.querySelectorAll('#opcoes button');
+      botoes.forEach(btn => btn.disabled = disabled);
+    }
+
+    // Botão voltar
+    const btnVoltar = document.getElementById('btnVoltar');
+    btnVoltar.addEventListener('click', () => {
+      document.querySelector('.atividade').style.display = 'none';
+      document.querySelector('.container').style.display = 'grid';
+      document.getElementById('mensagem').textContent = '';
+      indice = 0;
+      desabilitarBotoes(false);
+    });
+  </script>
+</body>
+</html>
