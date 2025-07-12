@@ -3,78 +3,137 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Portfólio Matemática Divertida</title>
+  <title>Matemática Divertida</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f8ff;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(to bottom, #fce4ec, #fff3e0);
       margin: 0;
       padding: 0;
       text-align: center;
     }
+
     header {
-      background-color: #00695c;
-      color: white;
-      padding: 20px;
+      background-color: #ff80ab;
+      color: #ffffff;
+      padding: 30px 20px;
+      border-bottom: 5px solid #ff4081;
     }
+
+    header h1 {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 20px;
+    }
+
     .container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      padding: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 25px;
+      padding: 30px;
     }
+
     .card {
-      background: #fff;
-      border-radius: 15px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      padding: 20px;
-      transition: transform 0.2s;
+      background: #fffde7;
+      border: 4px dashed #fbc02d;
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease-in-out;
     }
+
     .card:hover {
       transform: scale(1.05);
     }
+
     .card img {
-      width: 100px;
+      width: 80px;
       height: auto;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
     }
+
+    .card h2 {
+      color: #f57f17;
+      font-size: 24px;
+    }
+
+    .card p {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #555;
+    }
+
     button {
-      background-color: #2e8b57;
+      background-color: #4fc3f7;
       color: white;
       border: none;
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-size: 16px;
+      padding: 12px 25px;
+      border-radius: 12px;
+      font-size: 18px;
       margin: 5px;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: background-color 0.3s ease;
     }
+
     button:hover {
-      background-color: #3cb371;
+      background-color: #29b6f6;
     }
+
+    #btnVoltar {
+      background-color: #e57373;
+      margin-top: 20px;
+    }
+
+    #btnVoltar:hover {
+      background-color: #ef5350;
+    }
+
+    .atividade {
+      padding: 30px 20px;
+    }
+
+    #pergunta {
+      font-size: 24px;
+      color: #6a1b9a;
+      margin-bottom: 20px;
+    }
+
     #mensagem {
       font-weight: bold;
-      margin-top: 10px;
+      font-size: 20px;
+      margin-top: 20px;
     }
-    #btnVoltar {
-      background-color: #ff6347;
-      margin-top: 15px;
-      padding: 10px 20px;
+
+    #opcoes button {
+      margin: 10px;
+      background-color: #aed581;
+      color: #1b5e20;
+      font-weight: bold;
+    }
+
+    #opcoes button:hover {
+      background-color: #9ccc65;
+    }
+
+    .painel-pontos {
+      font-size: 18px;
+      background-color: #fff59d;
       border-radius: 10px;
-      border: none;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    #btnVoltar:hover {
-      background-color: #ff4500;
+      display: inline-block;
+      padding: 10px 20px;
+      margin-bottom: 20px;
+      border: 2px solid #fbc02d;
+      color: #795548;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Portfólio Visual - Matemática Divertida</h1>
-    <p>Escolha um nível e comece a brincar com a matemática!</p>
+    <h1>Matemática Divertida 🎲</h1>
+    <p>Escolha um nível e comece a brincar com os números!</p>
   </header>
 
   <div class="container">
@@ -99,147 +158,168 @@
   </div>
 
   <div class="atividade" style="display:none;">
-    <h2 id="pergunta"></h2>
+    <h2 id="pergunta">Qual é o resultado?</h2>
+
+    <div class="painel-pontos">
+      ✅ Acertos: <span id="acertos">0</span> |
+      ❌ Erros: <span id="erros">0</span>
+    </div>
+
     <div id="opcoes"></div>
+
     <p id="mensagem"></p>
+
     <button id="btnVoltar">Voltar ao menu</button>
   </div>
 
   <audio id="acerto" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
   <audio id="erro" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
 
- <script>
-  let nivel = '';
-  let indice = 0;
-  let repeticoes = { facil: 0, medio: 0, dificil: 0 };
-  let exercicios = [];
+  <script>
+    let nivel = '';
+    let indice = 0;
+    let repeticoes = { facil: 0, medio: 0, dificil: 0 };
+    let exercicios = [];
+    let pontuacao = { acertos: 0, erros: 0 };
 
-  function iniciar(n) {
-    nivel = n;
-    indice = 0;
-    repeticoes[nivel] += 1;
-    exercicios = gerarExercicios(nivel, repeticoes[nivel]);
+    function iniciar(n) {
+      nivel = n;
+      indice = 0;
+      pontuacao.acertos = 0;
+      pontuacao.erros = 0;
+      atualizarPontuacao();
+      repeticoes[nivel] += 1;
+      exercicios = gerarExercicios(nivel, repeticoes[nivel]);
 
-    document.querySelector('.container').style.display = 'none';
-    document.querySelector('.atividade').style.display = 'block';
-    mostrar();
-  }
+      document.querySelector('.container').style.display = 'none';
+      document.querySelector('.atividade').style.display = 'block';
+      mostrar();
+    }
 
-  function gerarExercicios(nivel, repeticao) {
-    const max = 10 + repeticao * 5; // valores aumentam a cada repetição
-    const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-    const lista = [];
+    function gerarExercicios(nivel, repeticao) {
+      const max = 10 + repeticao * 5;
+      const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+      const lista = [];
 
-    for (let i = 0; i < 6; i++) {
-      let a = rand(1, max);
-      let b = rand(1, max);
-      let pergunta = '';
-      let correta = 0;
+      for (let i = 0; i < 6; i++) {
+        let a = rand(1, max);
+        let b = rand(1, max);
+        let pergunta = '';
+        let correta = 0;
 
-      if (nivel === 'facil') {
-        if (Math.random() > 0.5) {
-          correta = a + b;
-          pergunta = `${a} + ${b} = ?`;
-        } else {
-          if (a < b) [a, b] = [b, a];
-          correta = a - b;
-          pergunta = `${a} - ${b} = ?`;
+        if (nivel === 'facil') {
+          if (Math.random() > 0.5) {
+            correta = a + b;
+            pergunta = `${a} + ${b} = ?`;
+          } else {
+            if (a < b) [a, b] = [b, a];
+            correta = a - b;
+            pergunta = `${a} - ${b} = ?`;
+          }
+        } else if (nivel === 'medio') {
+          if (Math.random() > 0.5) {
+            correta = a * b;
+            pergunta = `${a} × ${b} = ?`;
+          } else {
+            let prod = a * b;
+            correta = a;
+            pergunta = `${prod} ÷ ${b} = ?`;
+          }
+        } else if (nivel === 'dificil') {
+          const tipo = rand(1, 3);
+          if (tipo === 1) {
+            correta = a + b - rand(1, 5);
+            pergunta = `${a} + ${b} - ${a + b - correta} = ?`;
+          } else if (tipo === 2) {
+            correta = a * b + rand(1, 5);
+            pergunta = `${a} × ${b} + ${correta - a * b} = ?`;
+          } else {
+            correta = (a + b) * 2;
+            pergunta = `(${a} + ${b}) × 2 = ?`;
+          }
         }
-      } else if (nivel === 'medio') {
-        if (Math.random() > 0.5) {
-          correta = a * b;
-          pergunta = `${a} × ${b} = ?`;
-        } else {
-          let prod = a * b;
-          correta = a;
-          pergunta = `${prod} ÷ ${b} = ?`;
-        }
-      } else if (nivel === 'dificil') {
-        const tipo = rand(1, 3);
-        if (tipo === 1) {
-          correta = a + b - rand(1, 5);
-          pergunta = `${a} + ${b} - ${a + b - correta} = ?`;
-        } else if (tipo === 2) {
-          correta = a * b + rand(1, 5);
-          pergunta = `${a} × ${b} + ${correta - a * b} = ?`;
-        } else {
-          correta = (a + b) * 2;
-          pergunta = `(${a} + ${b}) × 2 = ?`;
-        }
+
+        const opcoes = embaralhar([correta, correta + 1, correta - 1]);
+        lista.push({ pergunta, opcoes, correta });
       }
 
-      const opcoes = embaralhar([correta, correta + 1, correta - 1]);
-      lista.push({ pergunta, opcoes, correta });
+      return lista;
     }
 
-    return lista;
-  }
+    function mostrar() {
+      const ex = exercicios[indice];
+      document.getElementById('pergunta').textContent = `${ex.pergunta} (${indice + 1} de ${exercicios.length})`;
+      const opDiv = document.getElementById('opcoes');
+      opDiv.innerHTML = '';
 
-  function mostrar() {
-    const ex = exercicios[indice];
-    document.getElementById('pergunta').textContent = `${ex.pergunta} (${indice + 1} de ${exercicios.length})`;
-    const opDiv = document.getElementById('opcoes');
-    opDiv.innerHTML = '';
+      ex.opcoes.forEach(o => {
+        const btn = document.createElement('button');
+        btn.textContent = o;
+        btn.onclick = () => verificar(o, btn);
+        opDiv.appendChild(btn);
+      });
 
-    ex.opcoes.forEach(o => {
-      const btn = document.createElement('button');
-      btn.textContent = o;
-      btn.onclick = () => verificar(o, btn);
-      opDiv.appendChild(btn);
+      document.getElementById('mensagem').textContent = '';
+    }
+
+    function verificar(resposta, botaoClicado) {
+      const ex = exercicios[indice];
+      const mensagem = document.getElementById('mensagem');
+      if (resposta === ex.correta) {
+        mensagem.textContent = 'Muito bem! 😊';
+        mensagem.style.color = 'green';
+        document.getElementById('acerto').play();
+        botaoClicado.style.backgroundColor = '#4CAF50';
+        pontuacao.acertos++;
+        desabilitarBotoes(true);
+        atualizarPontuacao();
+
+        setTimeout(() => {
+          indice++;
+          if (indice < exercicios.length) {
+            desabilitarBotoes(false);
+            mostrar();
+          } else {
+            mensagem.innerHTML = `🎉 Parabéns! Você concluiu o nível!<br>✅ Acertos: ${pontuacao.acertos} | ❌ Erros: ${pontuacao.erros}`;
+            document.querySelector('.atividade').style.display = 'none';
+            document.querySelector('.container').style.display = 'grid';
+          }
+        }, 1000);
+      } else {
+        mensagem.textContent = 'Tente novamente! 😅';
+        mensagem.style.color = 'red';
+        document.getElementById('erro').play();
+        botaoClicado.style.backgroundColor = '#f44336';
+        pontuacao.erros++;
+        atualizarPontuacao();
+
+        setTimeout(() => {
+          botaoClicado.style.backgroundColor = '';
+        }, 500);
+      }
+    }
+
+    function desabilitarBotoes(disabled) {
+      const botoes = document.querySelectorAll('#opcoes button');
+      botoes.forEach(btn => btn.disabled = disabled);
+    }
+
+    function embaralhar(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function atualizarPontuacao() {
+      document.getElementById('acertos').textContent = pontuacao.acertos;
+      document.getElementById('erros').textContent = pontuacao.erros;
+    }
+
+    document.getElementById('btnVoltar').addEventListener('click', () => {
+      document.querySelector('.atividade').style.display = 'none';
+      document.querySelector('.container').style.display = 'grid';
+      document.getElementById('mensagem').textContent = '';
+      indice = 0;
+      desabilitarBotoes(false);
     });
-
-    document.getElementById('mensagem').textContent = '';
-  }
-
-  function verificar(resposta, botaoClicado) {
-    const ex = exercicios[indice];
-    const mensagem = document.getElementById('mensagem');
-    if (resposta === ex.correta) {
-      mensagem.textContent = 'Muito bem! 😊';
-      mensagem.style.color = 'green';
-      document.getElementById('acerto').play();
-      botaoClicado.style.backgroundColor = '#4CAF50';
-      desabilitarBotoes(true);
-      setTimeout(() => {
-        indice++;
-        if (indice < exercicios.length) {
-          desabilitarBotoes(false);
-          mostrar();
-        } else {
-          mensagem.textContent = 'Parabéns! Você concluiu o nível!';
-          document.querySelector('.atividade').style.display = 'none';
-          document.querySelector('.container').style.display = 'grid';
-        }
-      }, 1000);
-    } else {
-      mensagem.textContent = 'Tente novamente! 😅';
-      mensagem.style.color = 'red';
-      document.getElementById('erro').play();
-      botaoClicado.style.backgroundColor = '#f44336';
-      setTimeout(() => {
-        botaoClicado.style.backgroundColor = '';
-      }, 500);
-    }
-  }
-
-  function desabilitarBotoes(disabled) {
-    const botoes = document.querySelectorAll('#opcoes button');
-    botoes.forEach(btn => btn.disabled = disabled);
-  }
-
-  function embaralhar(array) {
-    return array.sort(() => Math.random() - 0.5);
-  }
-
-  // Botão voltar
-  const btnVoltar = document.getElementById('btnVoltar');
-  btnVoltar.addEventListener('click', () => {
-    document.querySelector('.atividade').style.display = 'none';
-    document.querySelector('.container').style.display = 'grid';
-    document.getElementById('mensagem').textContent = '';
-    indice = 0;
-    desabilitarBotoes(false);
-  });
-</script>
+  </script>
 </body>
 </html>
