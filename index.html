@@ -7,35 +7,30 @@
   <style>
     body {
       font-family: 'Comic Sans MS', cursive, sans-serif;
-      background: linear-gradient(to bottom, #fce4ec, #fff3e0);
+      background: linear-gradient(to bottom, #ecfce4, #fff3e0);
       margin: 0;
       padding: 0;
       text-align: center;
     }
-
     header {
-      background-color: #ff80ab;
+      background-color: #80ff88;
       color: #ffffff;
       padding: 30px 20px;
-      border-bottom: 5px solid #ff4081;
+      border-bottom: 5px solid #80ff88;
     }
-
     header h1 {
       font-size: 36px;
       margin-bottom: 10px;
     }
-
     header p {
       font-size: 20px;
     }
-
     .container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 25px;
       padding: 30px;
     }
-
     .card {
       background: #fffde7;
       border: 4px dashed #fbc02d;
@@ -44,28 +39,23 @@
       box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.2);
       transition: transform 0.2s ease-in-out;
     }
-
     .card:hover {
       transform: scale(1.05);
     }
-
     .card img {
       width: 80px;
       height: auto;
       margin-bottom: 15px;
     }
-
     .card h2 {
       color: #f57f17;
       font-size: 24px;
     }
-
     .card p {
       font-size: 18px;
       margin-bottom: 15px;
       color: #555;
     }
-
     button {
       background-color: #4fc3f7;
       color: white;
@@ -77,47 +67,38 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
-
     button:hover {
       background-color: #29b6f6;
     }
-
     #btnVoltar {
       background-color: #e57373;
       margin-top: 20px;
     }
-
     #btnVoltar:hover {
       background-color: #ef5350;
     }
-
     .atividade {
       padding: 30px 20px;
     }
-
     #pergunta {
       font-size: 24px;
       color: #6a1b9a;
       margin-bottom: 20px;
     }
-
     #mensagem {
       font-weight: bold;
       font-size: 20px;
       margin-top: 20px;
     }
-
     #opcoes button {
       margin: 10px;
       background-color: #aed581;
       color: #1b5e20;
       font-weight: bold;
     }
-
     #opcoes button:hover {
       background-color: #9ccc65;
     }
-
     .painel-pontos {
       font-size: 18px;
       background-color: #fff59d;
@@ -265,38 +246,35 @@
     function verificar(resposta, botaoClicado) {
       const ex = exercicios[indice];
       const mensagem = document.getElementById('mensagem');
+      desabilitarBotoes(true);
+
       if (resposta === ex.correta) {
         mensagem.textContent = 'Muito bem! 😊';
         mensagem.style.color = 'green';
         document.getElementById('acerto').play();
         botaoClicado.style.backgroundColor = '#4CAF50';
         pontuacao.acertos++;
-        desabilitarBotoes(true);
-        atualizarPontuacao();
-
-        setTimeout(() => {
-          indice++;
-          if (indice < exercicios.length) {
-            desabilitarBotoes(false);
-            mostrar();
-          } else {
-            mensagem.innerHTML = `🎉 Parabéns! Você concluiu o nível!<br>✅ Acertos: ${pontuacao.acertos} | ❌ Erros: ${pontuacao.erros}`;
-            document.querySelector('.atividade').style.display = 'none';
-            document.querySelector('.container').style.display = 'grid';
-          }
-        }, 1000);
       } else {
-        mensagem.textContent = 'Tente novamente! 😅';
+        mensagem.textContent = `Ops! Era ${ex.correta}`;
         mensagem.style.color = 'red';
         document.getElementById('erro').play();
         botaoClicado.style.backgroundColor = '#f44336';
         pontuacao.erros++;
-        atualizarPontuacao();
-
-        setTimeout(() => {
-          botaoClicado.style.backgroundColor = '';
-        }, 500);
       }
+
+      atualizarPontuacao();
+
+      setTimeout(() => {
+        indice++;
+        if (indice < exercicios.length) {
+          desabilitarBotoes(false);
+          mostrar();
+        } else {
+          mensagem.innerHTML = `🎉 Parabéns! Você concluiu o nível!<br>✅ Acertos: ${pontuacao.acertos} | ❌ Erros: ${pontuacao.erros}`;
+          document.querySelector('.atividade').style.display = 'none';
+          document.querySelector('.container').style.display = 'grid';
+        }
+      }, 1000);
     }
 
     function desabilitarBotoes(disabled) {
