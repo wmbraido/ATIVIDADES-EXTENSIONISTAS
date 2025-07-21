@@ -7,16 +7,16 @@
   <style>
     body {
       font-family: 'Comic Sans MS', cursive, sans-serif;
-      background: linear-gradient(to bottom, #ecfce4, #fff3e0);
+      background: linear-gradient(to bottom, #e0f7fa, #ffffff);
       margin: 0;
       padding: 0;
       text-align: center;
     }
     header {
-      background-color: #80ff88;
+      background-color: #f8bbd0;
       color: #ffffff;
       padding: 30px 20px;
-      border-bottom: 5px solid #80ff88;
+      border-bottom: 5px solid #f48fb1;
     }
     header h1 {
       font-size: 36px;
@@ -32,8 +32,8 @@
       padding: 30px;
     }
     .card {
-      background: #fffde7;
-      border: 4px dashed #fbc02d;
+      background: #ffffff;
+      border: 4px dashed #f06292;
       border-radius: 20px;
       padding: 25px;
       box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.2);
@@ -48,7 +48,7 @@
       margin-bottom: 15px;
     }
     .card h2 {
-      color: #f57f17;
+      color: #ec407a;
       font-size: 24px;
     }
     .card p {
@@ -57,7 +57,7 @@
       color: #555;
     }
     button {
-      background-color: #4fc3f7;
+      background-color: #81d4fa;
       color: white;
       border: none;
       padding: 12px 25px;
@@ -68,14 +68,14 @@
       transition: background-color 0.3s ease;
     }
     button:hover {
-      background-color: #29b6f6;
+      background-color: #4fc3f7;
     }
-    #btnVoltar {
-      background-color: #e57373;
+    #btnVoltar, #btnJogarNovamente {
+      background-color: #f48fb1;
       margin-top: 20px;
     }
-    #btnVoltar:hover {
-      background-color: #ef5350;
+    #btnVoltar:hover, #btnJogarNovamente:hover {
+      background-color: #f06292;
     }
     .atividade {
       padding: 30px 20px;
@@ -89,25 +89,37 @@
       font-weight: bold;
       font-size: 20px;
       margin-top: 20px;
+      opacity: 1;
+      transition: opacity 0.5s ease;
     }
     #opcoes button {
       margin: 10px;
-      background-color: #aed581;
-      color: #1b5e20;
+      background-color: #c8e6c9;
+      color: #33691e;
       font-weight: bold;
     }
     #opcoes button:hover {
-      background-color: #9ccc65;
+      background-color: #aed581;
     }
     .painel-pontos {
       font-size: 18px;
-      background-color: #fff59d;
+      background-color: #fff9c4;
       border-radius: 10px;
       display: inline-block;
       padding: 10px 20px;
       margin-bottom: 20px;
       border: 2px solid #fbc02d;
-      color: #795548;
+      color: #6d4c41;
+    }
+    .tempo {
+      font-size: 16px;
+      color: #6d4c41;
+      margin-top: 10px;
+    }
+    .recorde {
+      font-size: 16px;
+      color: #6d4c41;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -115,6 +127,7 @@
   <header>
     <h1>Matemática Divertida 🎲</h1>
     <p>Escolha um nível e comece a brincar com os números!</p>
+    <div id="recordeAtual" class="recorde"></div>
   </header>
 
   <div class="container">
@@ -122,19 +135,19 @@
       <img src="https://cdn-icons-png.flaticon.com/512/201/201818.png" alt="Fácil" />
       <h2>Fácil</h2>
       <p>Adição e subtração simples</p>
-      <button onclick="iniciar('facil')">Começar</button>
+      <button aria-label="Começar nível fácil" onclick="iniciar('facil')">Começar</button>
     </div>
     <div class="card">
       <img src="https://cdn-icons-png.flaticon.com/512/201/201614.png" alt="Médio" />
       <h2>Médio</h2>
       <p>Multiplicação e divisão</p>
-      <button onclick="iniciar('medio')">Começar</button>
+      <button aria-label="Começar nível médio" onclick="iniciar('medio')">Começar</button>
     </div>
     <div class="card">
       <img src="https://cdn-icons-png.flaticon.com/512/201/201623.png" alt="Difícil" />
       <h2>Difícil</h2>
       <p>Desafios mistos</p>
-      <button onclick="iniciar('dificil')">Começar</button>
+      <button aria-label="Começar nível difícil" onclick="iniciar('dificil')">Começar</button>
     </div>
   </div>
 
@@ -145,12 +158,14 @@
       ✅ Acertos: <span id="acertos">0</span> |
       ❌ Erros: <span id="erros">0</span>
     </div>
+    <div class="tempo">⏰ Tempo: <span id="tempo">0</span>s</div>
 
     <div id="opcoes"></div>
 
     <p id="mensagem"></p>
 
     <button id="btnVoltar">Voltar ao menu</button>
+    <button id="btnJogarNovamente" style="display:none;">Jogar Novamente</button>
   </div>
 
   <audio id="acerto" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
@@ -162,10 +177,20 @@
     let repeticoes = { facil: 0, medio: 0, dificil: 0 };
     let exercicios = [];
     let pontuacao = { acertos: 0, erros: 0 };
+    let tempo = 0;
+    let timer;
 
     function iniciar(n) {
       nivel = n;
       indice = 0;
+      tempo = 0;
+      clearInterval(timer);
+      timer = setInterval(() => {
+        tempo++;
+        document.getElementById('tempo').textContent = tempo;
+      }, 1000);
+
+      atualizarRecorde();
       pontuacao.acertos = 0;
       pontuacao.erros = 0;
       atualizarPontuacao();
@@ -182,7 +207,7 @@
       const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
       const lista = [];
 
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 9; i++) {
         let a = rand(1, max);
         let b = rand(1, max);
         let pergunta = '';
@@ -236,6 +261,7 @@
       ex.opcoes.forEach(o => {
         const btn = document.createElement('button');
         btn.textContent = o;
+        btn.setAttribute('aria-label', `Opção ${o}`);
         btn.onclick = () => verificar(o, btn);
         opDiv.appendChild(btn);
       });
@@ -246,23 +272,28 @@
     function verificar(resposta, botaoClicado) {
       const ex = exercicios[indice];
       const mensagem = document.getElementById('mensagem');
+      mensagem.style.opacity = 1;
       desabilitarBotoes(true);
 
       if (resposta === ex.correta) {
         mensagem.textContent = 'Muito bem! 😊';
-        mensagem.style.color = 'green';
+        mensagem.style.color = '#388e3c';
         document.getElementById('acerto').play();
-        botaoClicado.style.backgroundColor = '#4CAF50';
+        botaoClicado.style.backgroundColor = '#a5d6a7';
         pontuacao.acertos++;
       } else {
-        mensagem.textContent = `Ops! Era ${ex.correta}`;
-        mensagem.style.color = 'red';
+        mensagem.textContent = `Ops! Era ${ex.correta}. Tente outra vez!`;
+        mensagem.style.color = '#c62828';
         document.getElementById('erro').play();
-        botaoClicado.style.backgroundColor = '#f44336';
+        botaoClicado.style.backgroundColor = '#ef9a9a';
         pontuacao.erros++;
       }
 
       atualizarPontuacao();
+
+      setTimeout(() => {
+        mensagem.style.opacity = 0;
+      }, 500);
 
       setTimeout(() => {
         indice++;
@@ -270,9 +301,10 @@
           desabilitarBotoes(false);
           mostrar();
         } else {
-          mensagem.innerHTML = `🎉 Parabéns! Você concluiu o nível!<br>✅ Acertos: ${pontuacao.acertos} | ❌ Erros: ${pontuacao.erros}`;
-          document.querySelector('.atividade').style.display = 'none';
-          document.querySelector('.container').style.display = 'grid';
+          clearInterval(timer);
+          salvarRecorde();
+          mensagem.innerHTML = `🎉 Parabéns! Você concluiu o nível!<br>✅ Acertos: ${pontuacao.acertos} | ❌ Erros: ${pontuacao.erros} <br>⏰ Tempo: ${tempo} segundos`;
+          document.getElementById('btnJogarNovamente').style.display = 'inline-block';
         }
       }, 1000);
     }
@@ -291,13 +323,35 @@
       document.getElementById('erros').textContent = pontuacao.erros;
     }
 
+    function salvarRecorde() {
+      const anterior = localStorage.getItem(`recorde-${nivel}`);
+      if (!anterior || pontuacao.acertos > parseInt(anterior)) {
+        localStorage.setItem(`recorde-${nivel}`, pontuacao.acertos);
+      }
+      atualizarRecorde();
+    }
+
+    function atualizarRecorde() {
+      const recorde = localStorage.getItem(`recorde-${nivel}`) || 0;
+      document.getElementById('recordeAtual').textContent = nivel ? `🎯 Recorde no nível ${nivel.toUpperCase()}: ${recorde} acertos` : '';
+    }
+
     document.getElementById('btnVoltar').addEventListener('click', () => {
+      clearInterval(timer);
       document.querySelector('.atividade').style.display = 'none';
       document.querySelector('.container').style.display = 'grid';
       document.getElementById('mensagem').textContent = '';
+      document.getElementById('btnJogarNovamente').style.display = 'none';
       indice = 0;
       desabilitarBotoes(false);
+      document.getElementById('tempo').textContent = '0';
+    });
+
+    document.getElementById('btnJogarNovamente').addEventListener('click', () => {
+      iniciar(nivel);
+      document.getElementById('btnJogarNovamente').style.display = 'none';
     });
   </script>
 </body>
 </html>
+
